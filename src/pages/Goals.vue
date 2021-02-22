@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center column">
+  <q-page class="flex flex-center column ">
     <q-dialog ref="dialog"
               persistent
               :maximized="maximizedToggle"
@@ -22,7 +22,7 @@
         </q-footer>
         <q-page-container>
           <q-page padding>
-            <q-card class="q-dialog-plugin__form">
+            <q-card class="q-dialog-plugin__form q-mb-lg">
               <q-form ref="myForm"
                       @submit="onSubmit"
               >
@@ -41,32 +41,26 @@
                   filled
                   v-model="goal.age"
                   label="Enter Age"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
                 />
 
                 <q-input
                   filled
                   v-model="goal.author"
                   label="Author *"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
+
                 />
 
                 <q-input
                   filled
                   v-model="goal.introduction"
                   label="Introduction *"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
+
                 />
                 <q-input
                   filled
                   v-model="goal.image"
                   label="Featured image"
                   hint="enter image url here"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
                 />
 
                 <q-editor
@@ -162,41 +156,33 @@
                   filled
                   v-model="goal.material"
                   label="Materials"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
                 />
                 <q-input
                   filled
                   v-model="goal.tools"
                   label="Tools"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
                 />
                 <q-input
                   filled
                   v-model="goal.repeat"
                   label="repeat"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
                 />
                 <q-input
                   filled
                   v-model="goal.series"
                   label="Part of Series"
-                  lazy-rules
-                  :rules="[ val => val && val.length > 0 || 'Please type something']"
                 />
 
 
-                <div>
+                <div class="q-mb-xl">
                   <q-btn label="Submit" type="submit" color="primary"/>
                   <q-btn label="Reset" type="reset" color="primary" @click="onReset" flat class="q-ml-sm"/>
                 </div>
               </q-form>
 
-              <q-card-actions align="right">
-                <q-btn color="primary" label="OK"/>
-                <q-btn color="primary" label="Cancel"/>
+              <q-card-actions align="right" >
+<!--                <q-btn color="primary" label="OK"/>-->
+<!--                <q-btn color="primary" label="Cancel"/>-->
               </q-card-actions>
             </q-card>
           </q-page>
@@ -330,7 +316,7 @@ export default defineComponent({
         this.$refs.myForm.validate().then(async success => {
           if (success) {
             debugger
-            this.goal.category = this.categories.find(item => item.name === this.goal.category)
+            this.goal.category = this.categories.find(item => item.name === this.category)
             debugger
             // let model={
             //   title:this.title,
@@ -370,9 +356,11 @@ export default defineComponent({
     onDialogHide() {
       // required to be emitted
       // when QDialog emits "hide" event
+      this.currentId='';
       this.$emit('hide')
     },
     addRow() {
+      this.goal={}
       this.show()
     }
   }
