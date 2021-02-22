@@ -1,0 +1,42 @@
+{
+  "name": "equip-admin",
+  "version": "0.0.1",
+  "description": "Equip Admin",
+  "productName": "Equip Admin",
+  "author": "mobilyte.apps@gmail.com",
+  "private": true,
+  "scripts": {
+    "test": "echo \"No test specified\" && exit 0",
+    "package": "electron-osx-sign 'dist/electron/Equip Admin-darwin-x64/Equip Admin.app' --platform=mas --type=development --entitlements='src-electron/default.entitlements.mas.plist' --provisioning-profile='src-electron/macprovisioning.provisionprofile'"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.0.0",
+    "axios": "^0.21.1",
+    "core-js": "^3.6.5",
+    "firebase": "^8.2.7",
+    "quasar": "^2.0.0-beta.1",
+    "vue": "^3.0.5"
+  },
+  "devDependencies": {
+    "@quasar/app": "^3.0.0-beta.1",
+    "electron": "^11.3.0",
+    "electron-packager": "^14.2.1",
+    "vue-router": "^4.0.3"
+  },
+  "browserslist": [
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 10.18.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}
