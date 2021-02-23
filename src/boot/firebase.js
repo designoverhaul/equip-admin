@@ -8,8 +8,10 @@ import config from '../plugins/env.json'
 export const fireApp = firebase.initializeApp(config)
 export const AUTH = fireApp.auth()
 export const firestore = fireApp.firestore()
+export const firestorage = fireApp.storage()
 
 export default boot(({app}) => {
   app.config.globalProperties.$auth = AUTH
   app.config.globalProperties.$firestore = firestore
+  app.config.globalProperties.$firestorage = firestorage
 })

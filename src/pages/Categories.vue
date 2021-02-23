@@ -1,7 +1,7 @@
 <template>
-  <q-page class="flex flex-center column">
+  <q-page class="fit row wrap justify-start items-start content-start ">
 
-    <q-card class="my-card">
+    <q-card class="my-card q-ma-lg">
 
       <q-card-section>
         <div class="text-h6">Enter Category Name</div>
@@ -15,10 +15,11 @@
     </q-card>
     <q-table
       title="Categories"
-      class="q-mt-md"
+      class="q-ma-lg"
       :rows="datatable"
       row-key="name"
       @row-click="rowClick"
+      :pagination.sync="pagination"
     />
 
   </q-page>
@@ -31,6 +32,9 @@ export default defineComponent({
   name: 'Category',
   data() {
     return {
+      pagination: {
+        rowsPerPage: 50 // current rows per page being displayed
+      },
       category: '',
       currentId: '',
       columns: [
@@ -235,4 +239,5 @@ export default defineComponent({
 .my-card
   width: 100%
   max-width: 500px
+
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center column ">
+  <q-page class="flex  column ">
     <q-dialog ref="dialog"
               persistent
               :maximized="maximizedToggle"
@@ -40,29 +40,32 @@
                 <q-input
                   filled
                   v-model="goal.age"
-                  label="Enter Age"
-                />
+                  label="Enter Age" />
 
                 <q-input
                   filled
                   v-model="goal.author"
-                  label="Author *"
+                  label="Author "
+                  class="q-my-lg"
 
                 />
 
                 <q-input
                   filled
                   v-model="goal.introduction"
-                  label="Introduction *"
+                  class="q-my-lg"
+                  label="Introduction "
 
                 />
-                <q-input
+<!--                <q-input
                   filled
                   v-model="goal.image"
                   label="Featured image"
-                  hint="enter image url here"
-                />
+                  class="q-my-lg"
+                />-->
+<!--                <q-item-label>OR</q-item-label>-->
 
+                <q-file filled v-model="uploadimage" label="select file" class="q-my-lg"/>
                 <q-editor
                   v-model="goal.html"
                   :dense="$q.screen.lt.md"
@@ -156,23 +159,26 @@
                   filled
                   v-model="goal.material"
                   label="Materials"
+                  class="q-my-lg"
                 />
                 <q-input
                   filled
                   v-model="goal.tools"
                   label="Tools"
+                  class="q-my-lg"
                 />
                 <q-input
                   filled
                   v-model="goal.repeat"
                   label="repeat"
+                  class="q-my-lg"
                 />
                 <q-input
                   filled
                   v-model="goal.series"
                   label="Part of Series"
+                  class="q-my-lg"
                 />
-
 
                 <div class="q-mb-xl">
                   <q-btn label="Submit" type="submit" color="primary"/>
@@ -180,9 +186,9 @@
                 </div>
               </q-form>
 
-              <q-card-actions align="right" >
-<!--                <q-btn color="primary" label="OK"/>-->
-<!--                <q-btn color="primary" label="Cancel"/>-->
+              <q-card-actions align="right">
+                <!--                <q-btn color="primary" label="OK"/>-->
+                <!--                <q-btn color="primary" label="Cancel"/>-->
               </q-card-actions>
             </q-card>
           </q-page>
@@ -195,12 +201,18 @@
       :rows="rows"
       :columns="columns"
       row-key="name"
-      @row-click="rowClick"
+      :pagination.sync="pagination"
     >
       <template v-slot:top>
         <q-btn color="primary" label="Add New Goal" @click="addRow"/>
         <q-space/>
 
+      </template>
+      <template v-slot:body-cell-actions="props">
+        <q-td :props="props">
+          <q-btn dense round flat color="grey" @click="editRow(props)" icon="edit"></q-btn>
+          <q-btn dense round flat color="grey" @click="deleteRow(props)" icon="delete"></q-btn>
+        </q-td>
       </template>
     </q-table>
 
@@ -214,6 +226,9 @@ export default defineComponent({
   name: 'Category',
   data() {
     return {
+      pagination: {
+        rowsPerPage: 50 // current rows per page being displayed
+      },
       model: null,
       category: '',
       goal: {
@@ -228,7 +243,9 @@ export default defineComponent({
         tools: '',
         repeat: '',
         series: '',
+        createdAt: '',
       },
+      uploadimage: '',
       dialog: false,
       maximizedToggle: true,
       options: [],
@@ -251,7 +268,9 @@ export default defineComponent({
         {name: 'age', label: 'Age', field: 'age'},
         {name: 'material', label: 'Material', field: 'material', sortable: true},
         {name: 'repeat', label: 'Repeat', field: 'repeat', sortable: true},
-        {name: 'series', label: 'Part of series', field: 'series', sortable: true}
+        {name: 'series', label: 'Part of series', field: 'series', sortable: true},
+        {name: 'createdat', label: 'Created', field: 'createdAt', sortable: true},
+        {name: 'actions', label: 'Actions', field: '', align: 'center'},
       ],
 
       rows: []
@@ -261,6 +280,21 @@ export default defineComponent({
     this.getData();
   },
   methods: {
+    editRow(props) {
+      this.rowClick(props.row)
+    },
+    deleteRow(props) {
+      this.$q.dialog({
+        title: 'Confirm',
+        message: 'Are you sure to delete this entity....?',
+        ok: "Yes, I'm sure",
+        cancel: true,
+        default: 'cancel'
+      }).onOk(() => {
+        this.$firestore.collection("goals").doc(props.row.id).delete()
+      } )
+     //
+    },
     getData() {
 
       this.$firestore.collection("categories").onSnapshot(docSnapshot => {
@@ -287,13 +321,14 @@ export default defineComponent({
         docs.forEach(item => {
           let _data = item.data();
           debugger
+          _data.createdAt=_data.createdAt.toDate().toDateString()
           this.rows.push(_data)
 
         })
 
       })
     },
-    rowClick(evt, row, index) {
+    rowClick(row) {
       this.currentId = row.id
       debugger
       this.goal = row
@@ -313,29 +348,30 @@ export default defineComponent({
         this.currentId = '';
         this.hide()
       } else {
+        let that=this;
         this.$refs.myForm.validate().then(async success => {
           if (success) {
-            debugger
-            this.goal.category = this.categories.find(item => item.name === this.category)
-            debugger
-            // let model={
-            //   title:this.title,
-            //   category:this.category,
-            //   author:this.author,
-            //   introduction:this.introduction,
-            //   image:this.image,
-            //   age:this.age,
-            //   html:this.html,
-            //   material:this.material,
-            //   tools:this.tools,
-            //   repeat:this.repeat,
-            //   series:this.series,
-            //   isActive:true
-            // }
-            //this.goal.category=this.category;
-            let ref = await this.$firestore.collection("goals").add(this.goal)
-            this.hide()
-            await this.$firestore.collection("goals").doc(ref.id).set({id: ref.id}, {merge: true})
+            if (this.uploadimage) {
+              let ref =  this.$firestorage.ref("goals/").child(this.uploadimage.name)
+              ref.put(this.uploadimage).then(function (snapshot) {
+                ref.getDownloadURL().then(async res => {
+                  debugger
+                  that.goal.category = that.categories.find(item => item.name === that.category)
+                  that.goal.createdAt = new Date()
+                  that.goal.image = res
+                  let reference = await that.$firestore.collection("goals").add(that.goal)
+                  await that.$firestore.collection("goals").doc(reference.id).set({id: reference.id}, {merge: true})
+                  that.hide()
+                })
+              });
+            }else {
+              alert("Select Image")
+            }
+            /* this.goal.category = this.categories.find(item => item.name === this.category)
+             this.goal.createdAt= new Date()
+             let ref = await this.$firestore.collection("goals").add(this.goal)
+             await this.$firestore.collection("goals").doc(ref.id).set({id: ref.id}, {merge: true})
+             this.hide()*/
           } else {
             // oh no, user has filled in
             // at least one invalid value
@@ -356,11 +392,11 @@ export default defineComponent({
     onDialogHide() {
       // required to be emitted
       // when QDialog emits "hide" event
-      this.currentId='';
+      this.currentId = '';
       this.$emit('hide')
     },
     addRow() {
-      this.goal={}
+      this.goal = {}
       this.show()
     }
   }
